@@ -234,7 +234,6 @@ def request_check():
             or public.md5(auth.password.strip() + tips) != app.config['BASIC_AUTH_PASSWORD']:
             return send_authenticated()
     
-
 @app.teardown_request
 def request_end(reques = None):
     not_acts = ['GetTaskSpeed','GetNetWork','check_pay_status','get_re_order_status','get_order_stat']
@@ -571,7 +570,7 @@ def files(pdata = None):
             'GetFileAccess','SetFileAccess','GetDirSize','SetBatchData','BatchPaste','install_rar','get_path_size',
             'DownloadFile','GetTaskSpeed','CloseLogs','InstallSoft','UninstallSoft','SaveTmpFile',
             'GetTmpFile','del_files_store','add_files_store','get_files_store','del_files_store_types','add_files_store_types',
-            'RemoveTask','ActionTask','Re_Recycle_bin','Get_Recycle_bin','Del_Recycle_bin','Close_Recycle_bin','Recycle_bin'
+            'RemoveTask','ActionTask','Re_Recycle_bin','Get_Recycle_bin','Del_Recycle_bin','Close_Recycle_bin','Recycle_bin','file_webshell_check','dir_webshell_check'
             )
     return publicObject(filesObject,defs,None,pdata)
 
@@ -634,15 +633,19 @@ def config(pdata = None):
         if public.is_local(): data['is_local'] = 'checked'
         return render_template( 'config.html',data=data)
     import config
-    defs = (
-    'get_panel_error_logs', 'clean_panel_error_logs', 'get_basic_auth_stat', 'set_basic_auth', 'get_cli_php_version',
-    'get_tmp_token', 'set_cli_php_version', 'DelOldSession', 'GetSessionCount', 'SetSessionConf', 'GetSessionConf',
-    'get_ipv6_listen', 'set_ipv6_status', 'GetApacheValue', 'SetApacheValue', 'GetNginxValue', 'SetNginxValue',
-    'get_token', 'set_token', 'set_admin_path', 'is_pro', 'get_php_config', 'get_config', 'SavePanelSSL', 'GetPanelSSL',
-    'GetPHPConf', 'SetPHPConf', 'GetPanelList', 'AddPanelInfo', 'SetPanelInfo', 'DelPanelInfo', 'ClickPanelInfo',
-    'SetPanelSSL', 'SetTemplates', 'Set502', 'setPassword', 'setUsername', 'setPanel', 'setPathInfo', 'setPHPMaxSize',
-    'getFpmConfig', 'setFpmConfig', 'setPHPMaxTime', 'syncDate', 'setPHPDisable', 'SetControl', 'ClosePanel',
-    'AutoUpdatePanel', 'SetPanelLock','return_mail_list','del_mail_list','add_mail_address','user_mail_send','get_user_mail','set_dingding','get_dingding','get_settings','user_stmp_mail_send','user_dingding_send')
+    defs = ('set_coll_open','get_qrcode_data','check_two_step','set_two_step_auth',
+            'get_key','get_php_session_path','set_php_session_path','get_cert_source',
+            'set_local','set_debug','get_panel_error_logs','clean_panel_error_logs',
+            'get_basic_auth_stat','set_basic_auth','get_cli_php_version','get_tmp_token',
+            'set_cli_php_version','DelOldSession', 'GetSessionCount', 'SetSessionConf', 
+            'GetSessionConf','get_ipv6_listen','set_ipv6_status','GetApacheValue','SetApacheValue',
+            'GetNginxValue','SetNginxValue','get_token','set_token','set_admin_path','is_pro',
+            'get_php_config','get_config','SavePanelSSL','GetPanelSSL','GetPHPConf','SetPHPConf',
+            'GetPanelList','AddPanelInfo','SetPanelInfo','DelPanelInfo','ClickPanelInfo','SetPanelSSL',
+            'SetTemplates','Set502','setPassword','setUsername','setPanel','setPathInfo','setPHPMaxSize',
+            'getFpmConfig','setFpmConfig','setPHPMaxTime','syncDate','setPHPDisable','SetControl',
+            'ClosePanel','AutoUpdatePanel','SetPanelLock','return_mail_list','del_mail_list','add_mail_address','user_mail_send','get_user_mail','set_dingding','get_dingding','get_settings','user_stmp_mail_send','user_dingding_send'
+            )
     return publicObject(config.config(),defs,None,pdata)
 
 @app.route('/ajax',methods=method_all)
@@ -659,6 +662,7 @@ def ajax(pdata = None):
             'UninstallLib','InstallLib','SetQiniuAS','GetQiniuAS','GetLibList','GetProcessList','GetNetWorkList',
             'GetNginxStatus','GetPHPStatus','GetTaskCount','GetSoftList','GetNetWorkIo','GetDiskIo','GetCpuIo',
             'CheckInstalled','UpdatePanel','GetInstalled','GetPHPConfig','SetPHPConfig')
+
     return publicObject(ajaxObject,defs,None,pdata)
 
 @app.route('/system',methods=method_all)
@@ -795,7 +799,7 @@ def panel_public():
     comm.checkWebType()
     comm.GetOS()
     result = plu.a(get)
-    session.clear()
+    #session.clear()
     return public.getJson(result),json_header
 
 @app.route('/favicon.ico',methods=method_get)
